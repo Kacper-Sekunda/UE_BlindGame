@@ -3,10 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NiagaraComponent.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "BlindGameCharacter.generated.h"
 
+class USpringArmComponent;
+class USpotLightComponent;
 class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
@@ -58,13 +61,23 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Sounds")	//Slide sound
 	USoundBase* WallSlideSound;
 
+	//Flashlight
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Flashlight")
+	USpringArmComponent* FlashlightSpringArm;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Flashlight")
+	USpotLightComponent* Flashlight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* FlashlightAction;
+	
 	//DEPRECATED with OnHit
 	//float LastHitTime = 0.0f;
 	//const float HitCooldown = 0.5f;
 
 protected:
-	virtual void BeginPlay();
-	void Tick(float DeltaTime);
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -90,9 +103,13 @@ protected:
 	
 	float PlayerSpeed;			//Player speed
 	
-	void CheckWallSlideSound();									//Check sound
-	void StartWallSlideSound(const FHitResult& WallHit) const;	//Play wall slide sound
-	void StopWallSlideSound() const;							//Stop wall slide sound
+	bool bIsFlashlightOn;
+	
+	void CheckWallSlideSound();										//Check sound
+	void StartWallSlideSound(const FHitResult& WallHit) const;		//Play wall slide sound
+	void StopWallSlideSound() const;								//Stop wall slide sound
 	void UpdateSlideSoundLocation(const FHitResult& WallHit) const;	//Update slide sound loc
+	void ToggleFlashlightPressed();
+	void ToggleFlashlightReleased();
 };
 

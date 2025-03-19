@@ -9,10 +9,13 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Components/AudioComponent.h"
+#include "Components/SpotLightComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+class UNiagaraSystem;
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 ABlindGameCharacter::ABlindGameCharacter()
@@ -37,6 +40,18 @@ ABlindGameCharacter::ABlindGameCharacter()
 
 	//TEMPLATE^^^
 
+	FlashlightSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("FlashlightSpringArm"));
+	FlashlightSpringArm->SetupAttachment(RootComponent);
+	FlashlightSpringArm->TargetArmLength = 50.f;
+	FlashlightSpringArm->bUsePawnControlRotation = true;
+
+	Flashlight = CreateDefaultSubobject<USpotLightComponent>(TEXT("Flashlight"));
+	Flashlight->SetupAttachment(FlashlightSpringArm);
+	Flashlight->SetIntensity(5000.f);
+	Flashlight->SetLightColor(FLinearColor::White);
+	Flashlight->SetVisibility(false);
+	bIsFlashlightOn = false;
+	
 	//GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ABlindGameCharacter::OnHit);
 	//DEPRECATED -- Old method of doing hit sound without sliding
 
@@ -73,6 +88,12 @@ void ABlindGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABlindGameCharacter::Look);
+
+		//Flashlight
+		EnhancedInputComponent->BindAction(FlashlightAction, ETriggerEvent::Started, this,
+		                                   &ABlindGameCharacter::ToggleFlashlightPressed);
+		EnhancedInputComponent->BindAction(FlashlightAction, ETriggerEvent::Completed, this,
+		                                   &ABlindGameCharacter::ToggleFlashlightReleased);
 	}
 	else
 	{
@@ -243,11 +264,23 @@ void ABlindGameCharacter::UpdateSlideSoundLocation(const FHitResult& WallHit) co
 	if (!SlideAudioComponent) return;   //Check slide component
 	
 	FVector Direction = WallHit.Normal;	//Get direction of wall
-	if (FVector::DotProduct(Direction, GetActorForwardVector()) < 0.75f)
+	if (FVector::DotProduct(Direction, GetActorForwardVector()) < 1.f)
 	{
 		Direction = -Direction;			//Invert direction
 	}
 
 	FVector WallOffsetLocation = GetActorLocation() + Direction * 250.0f;	//Cal wall offset
 	SlideAudioComponent->SetWorldLocation(WallOffsetLocation);				//Set audio comp location
+}
+
+void ABlindGameCharacter::ToggleFlashlightPressed()
+{
+	bIsFlashlightOn = true;
+	Flashlight->SetVisibility(bIsFlashlightOn);
+}
+
+void ABlindGameCharacter::ToggleFlashlightReleased()
+{
+	bIsFlashlightOn = false;
+	Flashlight->SetVisibility(bIsFlashlightOn);
 }

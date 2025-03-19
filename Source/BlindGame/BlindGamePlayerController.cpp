@@ -16,3 +16,25 @@ void ABlindGamePlayerController::BeginPlay()
 		Subsystem->AddMappingContext(InputMappingContext, 0);
 	}
 }
+
+void ABlindGamePlayerController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	ManageCameraShake();
+}
+
+void ABlindGamePlayerController::ManageCameraShake()
+{
+	//if (!IdleCameraShake || !WalkingCameraShake || !GetPawn()) return;
+
+	FVector Velocity = GetPawn()->GetVelocity();
+	float Speed = Velocity.Size();
+
+	if (Speed > 0)
+	{
+		ClientStartCameraShake(WalkingCameraShake);
+	}else
+	{
+		ClientStartCameraShake(IdleCameraShake);
+	}
+}

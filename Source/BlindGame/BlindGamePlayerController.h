@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Camera/CameraShakeBase.h"
 #include "BlindGamePlayerController.generated.h"
 
 class UInputMappingContext;
@@ -22,10 +23,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputMappingContext* InputMappingContext;
 
-	// Begin Actor interface
-protected:
-
 	virtual void BeginPlay() override;
+	void Tick(float DeltaTime);
+	void ManageCameraShake();
+	
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "Camera Shake")
+	TSubclassOf<UCameraShakeBase> IdleCameraShake;
 
-	// End Actor interface
+	UPROPERTY(EditDefaultsOnly, Category = "Camera Shake")
+	TSubclassOf<UCameraShakeBase> WalkingCameraShake;
+
+	UPROPERTY()
+	TSubclassOf<UCameraShakeBase> ActiveCameraShake;
 };
