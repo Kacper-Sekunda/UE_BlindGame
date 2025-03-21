@@ -25,8 +25,8 @@ void ABlindGamePlayerController::Tick(float DeltaTime)
 
 void ABlindGamePlayerController::ManageCameraShake()
 {
-	//if (!IdleCameraShake || !WalkingCameraShake || !GetPawn()) return;
-
+	if (!IdleCameraShake || !WalkingCameraShake || !GetPawn()) return;
+	
 	FVector Velocity = GetPawn()->GetVelocity();
 	float Speed = Velocity.Size();
 
