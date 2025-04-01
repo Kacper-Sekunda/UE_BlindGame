@@ -70,6 +70,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* FlashlightAction;
+
+	UPROPERTY(EditAnywhere, Category = "Haptics")
+	UForceFeedbackEffect* FFE_Forward;
+
+	UPROPERTY(EditAnywhere, Category = "Haptics")
+	UForceFeedbackEffect* FFE_Back;
+
+	UPROPERTY(EditAnywhere, Category = "Haptics")
+	UForceFeedbackEffect* FFE_Left;
+
+	UPROPERTY(EditAnywhere, Category = "Haptics")
+	UForceFeedbackEffect* FFE_Right;
 	
 	//DEPRECATED with OnHit
 	//float LastHitTime = 0.0f;

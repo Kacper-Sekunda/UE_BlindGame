@@ -262,13 +262,41 @@ void ABlindGameCharacter::UpdateSlideSoundLocation(const FHitResult& WallHit) co
 	if (!SlideAudioComponent) return;   //Check slide component
 	
 	FVector Direction = WallHit.Normal;	//Get direction of wall
-	if (FVector::DotProduct(Direction, GetActorForwardVector()) < 1.f)
+	float ForwardDot = FVector::DotProduct(Direction, GetActorForwardVector());
+	float RightDot = FVector::DotProduct(Direction, GetActorRightVector());
+	if (ForwardDot < 1.f)
 	{
 		Direction = -Direction;			//Invert direction
 	}
 
 	FVector WallOffsetLocation = GetActorLocation() + Direction * 250.0f;	//Cal wall offset
 	SlideAudioComponent->SetWorldLocation(WallOffsetLocation);				//Set audio comp location
+
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	//if (!FFE_Forward || !FFE_Back || !FFE_Right || !FFE_Left) return;		//Check valid
+	if (PlayerController)
+	{
+		if (ForwardDot > 0.7f)												//Forward
+		{
+			if (!FFE_Forward) return;
+			PlayerController->ClientPlayForceFeedback(FFE_Forward);
+		}
+		else if (ForwardDot < -0.7f)										//Back
+		{
+			if (!FFE_Back) return;
+			PlayerController->ClientPlayForceFeedback(FFE_Back);
+		}
+		else if (RightDot > -0.7f)											//Right
+		{
+			if (!FFE_Right) return;
+			PlayerController->ClientPlayForceFeedback(FFE_Right);
+		}
+		else if (RightDot < 0.7f)											//Left
+		{
+			if (!FFE_Left) return;
+			PlayerController->ClientPlayForceFeedback(FFE_Left);
+		}
+	}
 }
 
 
